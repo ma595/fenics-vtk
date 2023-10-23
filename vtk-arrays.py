@@ -27,8 +27,7 @@ def numpy_to_vtk():
     points = vtkPoints()
 
     for i in range(0, len(tri_points)):
-        # convert to python list 
-        # consider calling list() instead to retain python type.
+        # consider calling list() instead of tolist() to retain python type.
         # Otherwise, get nearest compatible Python type.
 
         points.InsertPoint(i, tri_points[i].tolist()) 
