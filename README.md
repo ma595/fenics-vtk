@@ -1,6 +1,11 @@
 # VTK experiments for Fenics
 
+## Environment setup:
+Begin by pulling docker image:
 
+`sudo docker pull dolfinx/dev-env:current`
+
+Then run `build-dolfinx.sh`
 
 ## Useful links:
 [VTK Support for unstructured grids with global arrays. #3688](https://github.com/ornladios/ADIOS2/issues/3688pport for unstructured grids with global arrays)
@@ -13,7 +18,7 @@
 [Logic for outputting mesh in vtk format in FEniCS](https://github.com/FEniCS/dolfinx/blob/main/python/dolfinx/plot.py)
 
 
-if on getting to checkpointing: [Checkpointing](https://github.com/jorgensd/adios4dolfinx/issues/3) these are the two ways of doing it.
+If on getting to checkpointing: [Checkpointing](https://github.com/jorgensd/adios4dolfinx/issues/3) these are the two ways of doing it.
 
 Final link:
 [Grid format](https://dglaeser.github.io/gridformat/)
