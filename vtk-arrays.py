@@ -1,15 +1,4 @@
-from dolfinx import cpp as _cpp
-from dolfinx import fem, mesh
 import numpy as np
-
-from vtkmodules.vtkCommonDataModel import (
-    VTK_TRIANGLE,
-    VTK_VERTEX,
-    vtkUnstructuredGrid
-)
-
-import vtkmodules
-print(dir(vtkmodules))
 
 # https://pyscience.wordpress.com/2014/09/06/numpy-to-vtk-converting-your-numpy-arrays-to-vtk-arrays-and-files/
 
@@ -17,6 +6,15 @@ print(dir(vtkmodules))
 # ./vtk-examples/src/Python/UnstructuredGrid/UGrid.py
 
 def numpy_to_vtk():
+
+    from vtkmodules.vtkCommonDataModel import (
+        VTK_TRIANGLE,
+        VTK_VERTEX,
+        vtkUnstructuredGrid
+    )
+
+    import vtkmodules
+    print(dir(vtkmodules))
 
     tri_points = np.array([[0,0,0],[0,1,0],[1,0,0],[1,1,0]], dtype=np.float64)
     triangles = np.array([[0,1,3], [0,2,3]], dtype=np.int64)
@@ -48,6 +46,113 @@ def numpy_to_vtk():
     # print(dir(vtkmodules.vtkCommonDataModel))
     # print(help(ugrid))
     
+def numpy_to_hdf5():
+    # Questions: 
+    # If we define points - should they be defined in 3D?
+    # assuming a single process.
+    import h5py
 
-numpy_to_vtk()
+    tri_points = np.array([[0,0,0],[0,1,0],[1,0,0],[1,1,0]], dtype=np.float64)
+    triangles = np.array([[0,1,3], [0,2,3]], dtype=np.int64)
+
+    data = [tri_points, triangles]
+
+    output_file = "test.hdf5"
+    
+    with h5py.File(output_file, "w") as hdffile:
+       # write support data
+       whole_extent = None
+       extent = None
+       vtkhdf_group = hdffile.create_group("VTKHDF")
+       vtkhdf_group.attrs.create("Version", [1, 0])
+       (points, points_size, connectivity, connectivity_size, offset, offset_size, types, types_size, number_of_connectivity_ids, number_of_points, number_of_cells) = (None, None, None, None, None, None, None, None, None, None, None)
+
+       number_of_pieces = 1   
+       (points, points_size, connectivity, connectivity_size, offset, offset_size, types, types_size, number_of_connectivity_ids, number_of_points, number_of_cells) = create_support_unstructuredgrid(data, number_of_pieces, vtkhdf_group)
+
+
+def create_support_unstructuredgrid(data, number_of_pieces, vtkhdf_group):
+    """
+    Creates datasets needed for an unstructured grid: NumberOfConnectivityIds,
+    NumberOfPoints, NumberOfCells (needed for showing pieces),
+    Points, Connectivity, Offsets, Types
+    """
+    tri_points = data[0]
+    triangles = data[1].ravel() # not sure whether this should be ravelled, only way to make offsets make sense. 
+
+    np_points = tri_points
+    np_points_size = len(tri_points)
+    np_connectivity = triangles
+    np_connectivity_size = len(triangles)
+    np_offset = np.array([0, 3])
+    np_offset_size = None
+    np_types = None
+    np_types_size = 1 
+    # num_of_connectivity_ids has size n (where num_of_connectivity[i] corresponds
+    # to the size of the connectivity array for for partition i. 
+    number_of_connectivity_ids = [np_connectivity_size]
+    # array of size n (corresponding to number of processes)
+    number_of_points = [np_points_size]
+    # array of size n (corresponding to number of processes)
+
+    number_of_cells = [np_connectivity_size]
+
+    vtkhdf_group.attrs.create("Type", np.string_("UnstructuredGrid"))
+    cells = triangles
+
+    number_of_connectivity_ids = vtkhdf_group.create_dataset(
+        "NumberOfConnectivityIds", (number_of_pieces,), np.int64)
+    # number_of_connectivity_ids[0] = cells.GetNumberOfConnectivityIds()
+    number_of_connectivity_ids[0] = 2 # ?
+    number_of_points = vtkhdf_group.create_dataset(
+        "NumberOfPoints", (number_of_pieces,), np.int64)
+    number_of_points[0] = np_points_size
+    number_of_cells = vtkhdf_group.create_dataset(
+        "NumberOfCells", (number_of_pieces,), np.int64)
+    # number_of_cells[0] = cells.GetNumberOfCells()
+    number_of_cells[0] = 3
+
+    # anp = vtk_to_numpy(data.GetPoints().GetData
+    anp = np_points
+    points = create_dataset("Points", anp, vtkhdf_group)
+    points_size = anp.shape[0]
+
+    # anp = vtk_to_numpy(cells.GetConnectivityArray())
+    anp = np_connectivity # ravelled connectivity 
+    connectivity = create_dataset("Connectivity", anp, vtkhdf_group)
+    connectivity_size = anp.shape[0]
+
+    # anp = vtk_to_numpy(cells.GetOffsetsArray())
+    anp = np_offset
+    offset = create_dataset("Offsets", anp, vtkhdf_group)
+    offset_size = anp.shape[0]
+
+    # anp = vtk_to_numpy(data.GetCellTypesArray())
+    # https://gitlab.kitware.com/vtk/vtk/-/blob/master/Documentation/docs/design_documents/VTKFileFormats.md
+    anp = np.array([5, 5])
+    types = create_dataset("Types", anp, vtkhdf_group)
+    types_size = anp.shape[0]
+    return (points, points_size, connectivity, connectivity_size,
+            offset, offset_size, types, types_size,
+            number_of_connectivity_ids, number_of_points, number_of_cells)
+
+
+def create_dataset(name, anp, group):
+    """
+    Create a HDF dataset 'name' inside 'group' from numpy array 'anp'.
+    If number_of_pieces > 1 we create a dataset with size unlimited.
+    """
+    shape = anp.shape
+    maxshape = shape
+    dset = group.create_dataset(name, shape, anp.dtype, maxshape=maxshape)
+    dset[0:] = anp
+    return dset
+
+
+
+# def dolfinx_to_hdf5():
+#     from dolfinx import cpp as _cpp
+#     from dolfinx import fem, mesh
+
+numpy_to_hdf5()
 
