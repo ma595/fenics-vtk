@@ -17,4 +17,3 @@ file_name = 'test.hdf5'
 reader = vtk.vtkHDFReader()
 reader.SetFileName(file_name)
 reader.Update()
-

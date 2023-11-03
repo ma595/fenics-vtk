@@ -80,11 +80,17 @@ def create_support_unstructuredgrid(data, number_of_pieces, vtkhdf_group):
     tri_points = data[0]
     triangles = data[1].ravel() # not sure whether this should be ravelled, only way to make offsets make sense. 
 
+    print(tri_points)
     np_points = tri_points
     np_points_size = len(tri_points)
     np_connectivity = triangles
+    print("connectivitiy ", np_connectivity)
     np_connectivity_size = len(triangles)
-    np_offset = np.array([0, 3])
+    print(np_connectivity)
+    np_offset = np.array([0, 3, 6]) # last entry corresponds to the length of the array https://vtk.org/doc/nightly/html/classvtkCellArray.html#details
+    print("np_offset shape", np_offset.shape)
+    print("offsets", np_offset)
+    print("offsets dtype", np_offset.dtype)
     np_offset_size = None
     np_types = None
     np_types_size = 1 
@@ -110,7 +116,7 @@ def create_support_unstructuredgrid(data, number_of_pieces, vtkhdf_group):
     number_of_cells = vtkhdf_group.create_dataset(
         "NumberOfCells", (number_of_pieces,), np.int64)
     # number_of_cells[0] = cells.GetNumberOfCells()
-    number_of_cells[0] = 3
+    number_of_cells[0] = 2
 
     # anp = vtk_to_numpy(data.GetPoints().GetData
     anp = np_points
@@ -126,10 +132,12 @@ def create_support_unstructuredgrid(data, number_of_pieces, vtkhdf_group):
     anp = np_offset
     offset = create_dataset("Offsets", anp, vtkhdf_group)
     offset_size = anp.shape[0]
+    print(anp.shape[0])
 
     # anp = vtk_to_numpy(data.GetCellTypesArray())
     # https://gitlab.kitware.com/vtk/vtk/-/blob/master/Documentation/docs/design_documents/VTKFileFormats.md
-    anp = np.array([5, 5])
+    # this needs to be unsigned char
+    anp = np.array([5, 5], dtype=np.ubyte)
     types = create_dataset("Types", anp, vtkhdf_group)
     types_size = anp.shape[0]
     return (points, points_size, connectivity, connectivity_size,
