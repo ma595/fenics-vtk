@@ -1,5 +1,5 @@
 # VTK experiments for Fenics
-
+Initial attempts with the VTK library for FEniCS. 
 ## Setting up environment
 
 
@@ -23,7 +23,8 @@ Naming is now linux-gnu-real32-32/ in /usr/local/petsc
 [Dolfinx tutorial](https://jsdokken.com/dolfinx-tutorial/)
 [ADIOS2 checkpointing I/O](https://hackmd.io/Zyz7pJWsQwCKM-t6Kr8OeQ)
 [Logic for outputting mesh in vtk format in FEniCS](https://github.com/FEniCS/dolfinx/blob/main/python/dolfinx/plot.py)
-# possibly not useful:
+
+## Other links
 [numpy_to_vtk](https://pyscience.wordpress.com/2014/09/06/numpy-to-vtk-converting-your-numpy-arrays-to-vtk-arrays-and-files/)
 
 If on getting to checkpointing: [Checkpointing](https://github.com/jorgensd/adios4dolfinx/issues/3) these are the two ways of doing it.
@@ -33,28 +34,18 @@ Final link:
 
 
 
-# VTK cell types are here:
-# https://vtk.org/doc/nightly/html/vtkCellType_8h_source.html
+[VTK cell types are here](# https://vtk.org/doc/nightly/html/vtkCellType_8h_source.html)
 
-# using the plot.py file for guidance
-# https://github.com/FEniCS/dolfinx/blob/main/python/dolfinx/plot.py
+[using the plot.py file for guidance](https://github.com/FEniCS/dolfinx/blob/main/python/dolfinx/plot.py)
 
-# description of vtk file format
-# https://examples.vtk.org/site/VTKFileFormats/
+[description of vtk file format](https://examples.vtk.org/site/VTKFileFormats/)
 
-# mention of vtk in xdmf and why hdf is better
-# https://www.kitware.com/vtk-hdf-reader/
-# the implementation of the HDF5 reader
-# https://gitlab.kitware.com/vtk/vtk/-/blob/master/IO/HDF/Testing/Cxx/TestHDFReader.cxx
-# vtk xml to vtk hdf converter
-# https://gitlab.kitware.com/danlipsa/vtkxml-to-vtkhdf
+[mention of vtk in xdmf and why hdf is better](https://www.kitware.com/vtk-hdf-reader/)
+[the implementation of the HDF5 reader](https://gitlab.kitware.com/vtk/vtk/-/blob/master/IO/HDF/Testing/Cxx/TestHDFReader.cxx)
+[vtk xml to vtk hdf converter](https://gitlab.kitware.com/danlipsa/vtkxml-to-vtkhdf)
 
-# xml formats : *.vtu
-
-# https://discourse.vtk.org/
-
-# from here:
-# https://discourse.vtk.org/t/working-with-a-hdf-file-in-vtk/11233/7
-# examples were listed
-# https://examples.vtk.org/site/Python/
+- xml formats : *.vtu
+- https://discourse.vtk.org/
+- https://discourse.vtk.org/t/working-with-a-hdf-file-in-vtk/11233/7
+- [examples were listed](https://examples.vtk.org/site/Python/)
 
