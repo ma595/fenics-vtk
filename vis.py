@@ -11,9 +11,19 @@ import vtk
 
 colors = vtkNamedColors()
 
-file_name = 'test.hdf5'
+file_name = 'test.hdf'
 
 # Read the source file.
 reader = vtk.vtkHDFReader()
 reader.SetFileName(file_name)
 reader.Update()
+
+outDS = reader.GetOutput()
+# outDS.GetPointData().SetScalars(outDS.GetPointData().GetArray("test"))
+
+# print(dir(outDS))
+
+# print(outDS.GetCellData())
+# print(outDS.GetPointData())
+# print(outDS.GetPoints())
+# print(outDS.GetCells())
