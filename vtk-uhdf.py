@@ -9,43 +9,49 @@ import numpy as np
 # https://gitlab.kitware.com/danlipsa/vtkxml-to-vtkhdf/-/blob/main/vtkxml-to-vtkhdf.py?ref_type=heads#L380-473
 # https://vtk.org/doc/nightly/html/VTKHDFFileFormat.html
 # https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html#unstructured-grid
-    
+
 
 def create_unstructuredgrid_hdf(points, cells, number_of_pieces, vtkhdf_group):
     """
-    Creates datasets needed for an unstructured grid: 
+    Creates datasets needed for an unstructured grid:
     Currently hardcoded triangular cells for the example above only.
     """
     tri_points = points
     number_of_cells = len(cells)
-    cells_ravel = cells.ravel() # vtk hdf requires list of points
+    cells_ravel = cells.ravel()  # vtk hdf requires list of points
     np_points = tri_points
     np_points_size = len(tri_points)
     np_connectivity = cells_ravel
     np_connectivity_size = len(cells_ravel)
 
     # last entry corresponds to the length of the array https://vtk.org/doc/nightly/html/classvtkCellArray.html#details
-    np_offset = np.array([0, 3, 6])    
+    np_offset = np.array([0, 3, 6])
     # np_offset_size = None
     # https://gitlab.kitware.com/vtk/vtk/-/blob/master/Documentation/docs/design_documents/VTKFileFormats.md
-    np_types = np.array([5,5], dtype=np.ubyte)
-    # np_types_size = 1 
+    np_types = np.array([5, 5], dtype=np.ubyte)
+    # np_types_size = 1
 
     vtkhdf_group.attrs.create("Type", np.string_("UnstructuredGrid"))
 
     # connectivity_ids
     # num_of_connectivity_ids has size n (where num_of_connectivity[i] corresponds
-    # to the size of the connectivity array for for partition i. 
+    # to the size of the connectivity array for for partition i.
     # number_of_connectivity_ids = [np_connectivity_size]
-    number_of_connectivity_ids = vtkhdf_group.create_dataset( "NumberOfConnectivityIds", (number_of_pieces,), np.int64)
-    number_of_connectivity_ids[0] = np_connectivity_size 
+    number_of_connectivity_ids = vtkhdf_group.create_dataset(
+        "NumberOfConnectivityIds", (number_of_pieces,), np.int64
+    )
+    number_of_connectivity_ids[0] = np_connectivity_size
 
-    # points 
-    number_of_points = vtkhdf_group.create_dataset( "NumberOfPoints", (number_of_pieces,), np.int64)
+    # points
+    number_of_points = vtkhdf_group.create_dataset(
+        "NumberOfPoints", (number_of_pieces,), np.int64
+    )
     number_of_points[0] = np_points_size
 
     # cells
-    number_of_cells = vtkhdf_group.create_dataset( "NumberOfCells", (number_of_pieces,), np.int64)
+    number_of_cells = vtkhdf_group.create_dataset(
+        "NumberOfCells", (number_of_pieces,), np.int64
+    )
     number_of_cells[0] = number_of_cells
 
     create_dataset("Points", np_points, vtkhdf_group)
@@ -57,7 +63,7 @@ def create_unstructuredgrid_hdf(points, cells, number_of_pieces, vtkhdf_group):
     # anp = vtk_to_numpy(data.GetCellTypesArray())
     # types
     create_dataset("Types", np_types, vtkhdf_group)
-    
+
     field_data_group = vtkhdf_group.create_group("CellData")
     # field_data_group.attrs.create("scalars", np.string_("CTEST"))
     anp = np.array([1.0, 2.0])
@@ -85,27 +91,28 @@ def numpy_to_hdf5():
     Defines a numpy array representing Dolfinx mesh and outputs as
     VTK unstructured grid HDF5 format. Currently only outputs as single partition.
     """
-    
+
     import h5py
 
-    tri_points = np.array([[0,0,0],[0,1,0],[1,0,0],[1,1,0]], dtype=np.float64)
-    triangles = np.array([[0,1,3], [0,2,3]], dtype=np.int64)
+    tri_points = np.array(
+        [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0]], dtype=np.float64
+    )
+    triangles = np.array([[0, 1, 3], [0, 2, 3]], dtype=np.int64)
 
     data = [tri_points, triangles]
 
     output_file = "test.hdf"
-    
+
     with h5py.File(output_file, "w") as hdffile:
-       # write support data
-       whole_extent = None
-       extent = None
-       vtkhdf_group = hdffile.create_group("VTKHDF")
-       vtkhdf_group.attrs.create("Version", [1, 0])
-       number_of_pieces = 1   
-       create_unstructuredgrid_hdf(tri_points, cells=triangles, number_of_pieces, vtkhdf_group)
-
-
+        # write support data
+        whole_extent = None
+        extent = None
+        vtkhdf_group = hdffile.create_group("VTKHDF")
+        vtkhdf_group.attrs.create("Version", [1, 0])
+        number_of_pieces = 1
+        create_unstructuredgrid_hdf(
+            tri_points, triangles, number_of_pieces, vtkhdf_group
+        )
 
 
 numpy_to_hdf5()
-
