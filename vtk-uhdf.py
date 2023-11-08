@@ -98,7 +98,7 @@ def create_unstructuredgrid_hdf(points, cells, number_of_pieces, vtkhdf_group):
 def create_dataset(name, anp, group):
     """
     Create a HDF dataset 'name' inside 'group' from numpy array 'anp'.
-    If number_of_pieces > 1 we create a dataset with size unlimited.
+        TODO: If number_of_pieces > 1 we create a dataset with size unlimited.
     """
     maxshape = anp.shape
     dset = group.create_dataset(name, anp.shape, anp.dtype, maxshape=maxshape)
