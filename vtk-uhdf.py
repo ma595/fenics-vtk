@@ -25,7 +25,8 @@ def create_unstructuredgrid_hdf(points, cells, number_of_pieces, vtkhdf_group):
     np_connectivity_size = len(cells_ravel)
 
     # last entry corresponds to the length of the array https://vtk.org/doc/nightly/html/classvtkCellArray.html#details
-    np_offset = np.array([0, 3, 6])     # np_offset_size = None
+    np_offset = np.array([0, 3, 6])    
+    # np_offset_size = None
     # https://gitlab.kitware.com/vtk/vtk/-/blob/master/Documentation/docs/design_documents/VTKFileFormats.md
     np_types = np.array([5,5], dtype=np.ubyte)
     # np_types_size = 1 
@@ -33,6 +34,9 @@ def create_unstructuredgrid_hdf(points, cells, number_of_pieces, vtkhdf_group):
     vtkhdf_group.attrs.create("Type", np.string_("UnstructuredGrid"))
 
     # connectivity_ids
+    # num_of_connectivity_ids has size n (where num_of_connectivity[i] corresponds
+    # to the size of the connectivity array for for partition i. 
+    # number_of_connectivity_ids = [np_connectivity_size]
     number_of_connectivity_ids = vtkhdf_group.create_dataset( "NumberOfConnectivityIds", (number_of_pieces,), np.int64)
     number_of_connectivity_ids[0] = np_connectivity_size 
 
@@ -55,12 +59,12 @@ def create_unstructuredgrid_hdf(points, cells, number_of_pieces, vtkhdf_group):
     create_dataset("Types", np_types, vtkhdf_group)
     
     field_data_group = vtkhdf_group.create_group("CellData")
-#    field_data_group.attrs.create("scalars", np.string_("CTEST"))
+    # field_data_group.attrs.create("scalars", np.string_("CTEST"))
     anp = np.array([1.0, 2.0])
     create_dataset("CTEST", anp, field_data_group)
 
     field_data_group = vtkhdf_group.create_group("PointData")
-#    field_data_group.attrs.create("scalars", np.string_("PTEST"))
+    # field_data_group.attrs.create("scalars", np.string_("PTEST"))
     anp = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     create_dataset("PTEST", anp, field_data_group)
 
@@ -100,14 +104,6 @@ def numpy_to_hdf5():
        number_of_pieces = 1   
        create_unstructuredgrid_hdf(tri_points, cells=triangles, number_of_pieces, vtkhdf_group)
 
-
-    # num_of_connectivity_ids has size n (where num_of_connectivity[i] corresponds
-    # to the size of the connectivity array for for partition i. 
-    # number_of_connectivity_ids = [np_connectivity_size]
-    # array of size n (corresponding to number of processes)
-    # number_of_points = [np_points_size]
-    # array of size n (corresponding to number of processes)
-    # number_of_cells = [np_connectivity_size]
 
 
 
